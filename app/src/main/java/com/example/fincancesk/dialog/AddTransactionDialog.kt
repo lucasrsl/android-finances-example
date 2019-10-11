@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.example.fincancesk.R
-import com.example.fincancesk.delegate.TransacrionDelegate
+import com.example.fincancesk.delegate.TransactionDelegate
 import com.example.fincancesk.extension.brazilFormatter
 import com.example.fincancesk.extension.convertToCalendar
 import com.example.fincancesk.model.Transaction
@@ -24,18 +24,25 @@ class AddTransactionDialog(
 ) {
 
     private val createdView = createLayout()
-    fun configDialog(transacrionDelegate: TransacrionDelegate) {
+    fun configDialog(type: Type, transactionDelegate: TransactionDelegate) {
 
         configDateField()
 
-        configCategoryField()
+        configCategoryField(type)
 
-        configForm(transacrionDelegate)
+        configForm(type, transactionDelegate)
     }
 
-    private fun configForm(transacrionDelegate: TransacrionDelegate) {
+    private fun configForm(type: Type, transactionDelegate: TransactionDelegate) {
+
+        val title = if (type == Type.REVENUE) {
+            R.string.adiciona_receita
+        } else {
+            R.string.adiciona_despesa
+        }
+
         AlertDialog.Builder(context)
-            .setTitle(R.string.adiciona_despesa)
+            .setTitle(title)
             .setView(createdView)
             .setPositiveButton(
                 "Adicionar"
@@ -52,13 +59,13 @@ class AddTransactionDialog(
                 val date = dateText.convertToCalendar()
 
                 val createdTransaction = Transaction(
-                    type = Type.EXPENSE,
+                    type = type,
                     value = value,
                     date = date,
                     category = categoryText
                 )
 
-                transacrionDelegate.delegate(createdTransaction)
+                transactionDelegate.delegate(createdTransaction)
             }
 
             .setNegativeButton("Cancelar", null)
@@ -80,11 +87,17 @@ class AddTransactionDialog(
         }
     }
 
-    private fun configCategoryField() {
+    private fun configCategoryField(type: Type) {
+        val categories = if (type == Type.REVENUE) {
+            R.array.categorias_de_receita
+        } else {
+            R.array.categorias_de_despesa
+        }
+
         val adapter = ArrayAdapter
             .createFromResource(
                 context,
-                R.array.categorias_de_despesa,
+                categories,
                 android.R.layout.simple_spinner_dropdown_item
             )
 
