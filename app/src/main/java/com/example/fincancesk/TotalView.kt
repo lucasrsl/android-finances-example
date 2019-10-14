@@ -9,9 +9,11 @@ import com.example.fincancesk.model.Transaction
 import kotlinx.android.synthetic.main.resumo_card.view.*
 import java.math.BigDecimal
 
-class TotalView(private val context:Context,
-                private val transactions: List<Transaction>,
-                private val view: View) {
+class TotalView(
+    context: Context,
+    transactions: List<Transaction>,
+    private val view: View?
+) {
 
     private val total = Total(transactions)
 
@@ -26,29 +28,35 @@ class TotalView(private val context:Context,
     }
 
     private fun setTotalExpense() {
-        with(view.resumo_card_despesa) {
-            text = total.expense.brazilFormatter()
-            setTextColor(expenseColor)
+        view?.let {
+            with(it.resumo_card_despesa) {
+                text = total.expense.brazilFormatter()
+                setTextColor(expenseColor)
+            }
         }
     }
 
     private fun setTotalRevenue() {
-        with(view.resumo_card_receita) {
-            text = total.revenue.brazilFormatter()
-            setTextColor(revenueColor)
+        view?.let {
+            with(it.resumo_card_receita) {
+                text = total.revenue.brazilFormatter()
+                setTextColor(revenueColor)
+            }
         }
     }
 
     private fun setTotal() {
         val total: BigDecimal = total.total
 
-        var totalColor: Int = colorByValue(total)
+        val totalColor: Int = colorByValue(total)
 
-        with(view.resumo_card_total) {
-            setTextColor(totalColor)
-            text = total
-                .brazilFormatter()
-                .replace("-R\$ ", "R$ -")
+        view?.let {
+            with(it.resumo_card_total) {
+                setTextColor(totalColor)
+                text = total
+                    .brazilFormatter()
+                    .replace("-R\$ ", "R$ -")
+            }
         }
     }
 
@@ -56,6 +64,6 @@ class TotalView(private val context:Context,
         if (total >= BigDecimal.ZERO) {
             return revenueColor
         }
-        return  expenseColor
+        return expenseColor
     }
 }

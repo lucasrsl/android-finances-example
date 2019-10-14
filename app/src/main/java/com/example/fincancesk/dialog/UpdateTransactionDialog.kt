@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.form_transacao.view.*
 import java.math.BigDecimal
 import java.util.Calendar
 
-class AddTransactionDialog(
+class UpdateTransactionDialog(
     private val viewGroup: ViewGroup,
     private val context: Context
 ) {
@@ -28,13 +28,20 @@ class AddTransactionDialog(
     private val categoryField = createdView.form_transacao_categoria
     private val dateField = createdView.form_transacao_data
 
-    fun call(type: Type, transactionDelegate: TransactionDelegate) {
+    fun call(transaction: Transaction, transactionDelegate: TransactionDelegate) {
+
+        val type = transaction.type
+
 
         configDateField()
-
         configCategoryField(type)
-
         configForm(type, transactionDelegate)
+
+        valueField.setText(transaction.value.toString())
+        dateField.setText(transaction.date.brazilFormatter())
+        val categories = context.resources.getStringArray(categoriesBy(type))
+        val indexCategory = categories.indexOf(transaction.category)
+        categoryField.setSelection(indexCategory, true)
     }
 
     private fun configForm(type: Type, transactionDelegate: TransactionDelegate) {
@@ -45,7 +52,7 @@ class AddTransactionDialog(
             .setTitle(title)
             .setView(createdView)
             .setPositiveButton(
-                "Adicionar"
+                "Alterar"
             ) { _, _ ->
                 val valueText = valueField.text.toString()
                 val dateText = dateField.text.toString()
@@ -71,9 +78,9 @@ class AddTransactionDialog(
 
     private fun titleBy(type: Type): Int {
         if (type == Type.REVENUE) {
-             return R.string.adiciona_receita
+             return R.string.altera_receita
         }
-        return R.string.adiciona_despesa
+        return R.string.altera_despesa
     }
 
 
